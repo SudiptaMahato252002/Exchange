@@ -27,80 +27,80 @@ public class MatchingEngineTest
         orderBook=new OrderBook();
     }
     
-    // @Test
-    // void shouldFullyMatchBuyAndSellOrder()
-    // {
-    //     Order sell1 = Order.builder()
-    //         .orderId("S1")
-    //         .side(OrderSide.SELL)
-    //         .type(OrderType.LIMIT)
-    //         .price(BigDecimal.valueOf(105)) // NOT matchable
-    //         .quantity(10)
-    //         .build();
+    @Test
+    void shouldFullyMatchBuyAndSellOrder()
+    {
+        Order sell1 = Order.builder()
+            .orderId("S1")
+            .side(OrderSide.SELL)
+            .type(OrderType.LIMIT)
+            .price(BigDecimal.valueOf(105)) // NOT matchable
+            .quantity(10)
+            .build();
 
-    //     Order sell2 = Order.builder()
-    //             .orderId("S2")
-    //             .side(OrderSide.SELL)
-    //             .type(OrderType.LIMIT)
-    //             .price(BigDecimal.valueOf(100)) // MATCHABLE
-    //             .quantity(5)
-    //             .build();
+        Order sell2 = Order.builder()
+                .orderId("S2")
+                .side(OrderSide.SELL)
+                .type(OrderType.LIMIT)
+                .price(BigDecimal.valueOf(100)) // MATCHABLE
+                .quantity(5)
+                .build();
 
-    //     Order sell3 = Order.builder()
-    //             .orderId("S3")
-    //             .side(OrderSide.SELL)
-    //             .type(OrderType.LIMIT)
-    //             .price(BigDecimal.valueOf(100))
-    //             .quantity(5)
-    //             .build();
+        Order sell3 = Order.builder()
+                .orderId("S3")
+                .side(OrderSide.SELL)
+                .type(OrderType.LIMIT)
+                .price(BigDecimal.valueOf(100))
+                .quantity(5)
+                .build();
 
-    //     Order buy1 = Order.builder()
-    //             .orderId("B1")
-    //             .side(OrderSide.BUY)
-    //             .type(OrderType.LIMIT)
-    //             .price(BigDecimal.valueOf(100))
-    //             .quantity(5)
-    //             .build();
+        Order buy1 = Order.builder()
+                .orderId("B1")
+                .side(OrderSide.BUY)
+                .type(OrderType.LIMIT)
+                .price(BigDecimal.valueOf(100))
+                .quantity(5)
+                .build();
 
-    //     Order buy2 = Order.builder()
-    //             .orderId("B2")
-    //             .side(OrderSide.BUY)
-    //             .type(OrderType.LIMIT)
-    //             .price(BigDecimal.valueOf(100))
-    //             .quantity(5)
-    //             .build();
+        Order buy2 = Order.builder()
+                .orderId("B2")
+                .side(OrderSide.BUY)
+                .type(OrderType.LIMIT)
+                .price(BigDecimal.valueOf(100))
+                .quantity(5)
+                .build();
 
-    //     Order buy3 = Order.builder()
-    //             .orderId("B3")
-    //             .side(OrderSide.BUY)
-    //             .type(OrderType.LIMIT)
-    //             .price(BigDecimal.valueOf(100))
-    //             .quantity(5)
-    //             .build();
+        Order buy3 = Order.builder()
+                .orderId("B3")
+                .side(OrderSide.BUY)
+                .type(OrderType.LIMIT)
+                .price(BigDecimal.valueOf(100))
+                .quantity(5)
+                .build();
 
-    //     orderBook.addOrder(sell1);
-    //     orderBook.addOrder(sell2);
-    //     orderBook.addOrder(sell3);
+        orderBook.addOrder(sell1);
+        orderBook.addOrder(sell2);
+        orderBook.addOrder(sell3);
 
-    //     System.out.println("📕 ORDER BOOK BEFORE FIRST BUY");
-    //     orderBook.printPretty();
+        System.out.println("📕 ORDER BOOK BEFORE FIRST BUY");
+        orderBook.printPretty();
 
-    //     List<Trade> trades=orderBook.addOrder(buy1);
+        List<Trade> trades=orderBook.addOrder(buy1);
 
-    //     System.out.println("📕 ORDER BOOK AFTER FIRST BUY");
-    //     orderBook.printPretty();
+        System.out.println("📕 ORDER BOOK AFTER FIRST BUY");
+        orderBook.printPretty();
 
-    //     assertEquals(1, trades.size());
-    //     Trade trade = trades.get(0);
-    //     System.out.println(trade);
-    //     System.out.println(trade.getBuyOrderId());
-    //     System.out.println(trade.getSellOrderId());
-    //     assertEquals("S2", trade.getSellOrderId());
-    //     assertEquals("B1", trade.getBuyOrderId());
-    //     assertEquals(5, trade.getQuantity());
-    //     assertEquals(BigDecimal.valueOf(100), trade.getPrice());
+        assertEquals(1, trades.size());
+        Trade trade = trades.get(0);
+        System.out.println(trade);
+        System.out.println(trade.getBuyOrderId());
+        System.out.println(trade.getSellOrderId());
+        assertEquals("S2", trade.getSellOrderId());
+        assertEquals("B1", trade.getBuyOrderId());
+        assertEquals(5, trade.getQuantity());
+        assertEquals(BigDecimal.valueOf(100), trade.getPrice());
 
-    // }
+    }
 
     @Test
     void shouldPartiallyFillOrder() {

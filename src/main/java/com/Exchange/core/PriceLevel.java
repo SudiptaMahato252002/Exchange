@@ -1,45 +1,67 @@
 package com.Exchange.core;
 
 import java.math.BigDecimal;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.Exchange.model.Order;
 
 public class PriceLevel 
 {
     private BigDecimal price;
-    private LinkedList<Order> orders;
-    private int totalVolume;
+    private Deque<Order> orders;
+    private AtomicInteger totalVolume;
+    private ReentrantLock lock;
 
     public PriceLevel(BigDecimal price)
     {
         this.price=price;
-        this.orders=new LinkedList<>();
-        this.totalVolume=0;
+        this.orders=new ConcurrentLinkedDeque<>();
+        this.totalVolume=new AtomicInteger(0);
+        this.lock=new ReentrantLock();
     }
 
     public void addOrder(Order order)
     {
-        orders.addLast(order);
-        totalVolume+=order.getRemainingQuantiity();
+        lock.lock();
+        try
+        {
+            orders.addLast(order);
+            totalVolume.addAndGet(order.getRemainingQuantiity());
+        }
+        finally{
+            lock.unlock();
+        }
+        // orders.addLast(order);
+        // totalVolume+=order.getRemainingQuantiity();
 
     }
 
     public boolean removeOrder(String orderId)
     {
-        Iterator<Order> iterator=orders.iterator();
-        while(iterator.hasNext())
+        lock.lock();
+        try
         {
-            Order order=iterator.next();
-            if(order.getOrderId().equals(orderId))
+            Iterator<Order> iterator=orders.iterator();
+            while(iterator.hasNext())
             {
-                totalVolume-=order.getRemainingQuantiity();
-                iterator.remove();
-                return true;
+                Order order=iterator.next();
+                if(order.getOrderId().equals(orderId))
+                {
+                    totalVolume.getAndAdd(-order.getRemainingQuantiity());
+                    iterator.remove();
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     public Order getFirstOrder()
@@ -47,10 +69,21 @@ public class PriceLevel
         return orders.peekFirst();
     }
 
-    // public Order removeFirstOrder()
-    // {
-
-    // }
+    public void removeFirstOrderIfFilled()
+    {
+        lock.lock();
+        try
+        {
+            Order order=orders.peekFirst();
+            if(order!=null && order.getRemainingQuantiity()==0)
+            {
+                orders.pollFirst();
+            }
+        }
+        finally{
+            lock.unlock();
+        }
+    }
 
     public boolean isEmpty()
     {
@@ -59,7 +92,7 @@ public class PriceLevel
 
     public int getTotalVolume()
     {
-        return totalVolume;
+        return totalVolume.get();
     }
 
     public int getOrderCount()
@@ -72,7 +105,7 @@ public class PriceLevel
         return price;
     }
 
-    public LinkedList<Order> getOrders() {
+    public Deque<Order> getOrders() {
         return orders;
     }
 

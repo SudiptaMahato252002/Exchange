@@ -3,7 +3,6 @@ package com.Exchange.core;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.Exchange.model.Order;
 import com.Exchange.model.OrderSide;
@@ -31,7 +30,7 @@ public class MatchingEngine
     {
             while(buy.getRemainingQuantiity()>0&&!orderBook.getAsks().isEmpty())
             {
-                Map.Entry<BigDecimal,PriceLevel> bestAsk=orderBook.getAsks().firstEntry();
+                var bestAsk=orderBook.getAsks().firstEntry();
                 BigDecimal askPrice=bestAsk.getKey();
                 
                 if((buy.getType()==OrderType.LIMIT)&&(askPrice.compareTo(buy.getPrice())>0))
@@ -40,14 +39,16 @@ public class MatchingEngine
                 }
                 PriceLevel level=bestAsk.getValue();
                 Order sell=level.getFirstOrder();
+                if (sell == null) break;
 
                 Trade trade=executeMatch(buy, sell, askPrice);
                 trades.add(trade);
 
-                if(sell.getRemainingQuantiity()==0)
-                {
-                    level.removeOrder(sell.getOrderId());
-                }
+                // if(sell.getRemainingQuantiity()==0)
+                // {
+                //     level.removeOrder(sell.getOrderId());
+                // }
+                level.removeFirstOrderIfFilled();
                 if(level.isEmpty())
                 {
                     orderBook.getAsks().remove(askPrice);
@@ -60,7 +61,7 @@ public class MatchingEngine
     {
         while(sell.getRemainingQuantiity()>0&&!orderBook.getBids().isEmpty())
         {
-            Map.Entry<BigDecimal,PriceLevel> bestBids=orderBook.getBids().firstEntry();
+            var bestBids=orderBook.getBids().firstEntry();
             BigDecimal bidPrice=bestBids.getKey();
             if(sell.getSide()==OrderSide.SELL&&sell.getPrice().compareTo(bidPrice)>0)
             {
@@ -68,14 +69,19 @@ public class MatchingEngine
             }
             PriceLevel level=bestBids.getValue();
             Order buy=level.getFirstOrder();
-
+            if(buy==null)
+            {
+                break;
+            }
             Trade trade=executeMatch(sell, buy, bidPrice);
             trades.add(trade);
 
-            if(buy.getRemainingQuantiity()==0)
-            {
-                level.removeOrder(buy.getOrderId());
-            }
+            // if(buy.getRemainingQuantiity()==0)
+            // {
+            //     level.removeOrder(buy.getOrderId());
+            // }
+            level.removeFirstOrderIfFilled();
+
             if(level.isEmpty())
             {
                 orderBook.getBids().remove(bidPrice);

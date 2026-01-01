@@ -1,9 +1,8 @@
 package com.Exchange.core;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.Exchange.model.Order;
 import com.Exchange.model.OrderSide;
@@ -14,8 +13,8 @@ import lombok.Data;
 @Data
 public class OrderBook 
 {
-    private final TreeMap<BigDecimal,PriceLevel> bids=new TreeMap<>(Comparator.reverseOrder());
-    private final TreeMap<BigDecimal,PriceLevel> asks=new TreeMap<>();
+    private final ConcurrentSkipListMap<BigDecimal,PriceLevel> bids=new ConcurrentSkipListMap<>((a,b)->b.compareTo(a));
+    private final ConcurrentSkipListMap<BigDecimal,PriceLevel> asks=new ConcurrentSkipListMap<>();
     // private final Map<String,Order> orderMap;
     private BigDecimal lastTradePrice;
     
@@ -35,7 +34,7 @@ public class OrderBook
     
     public void addToBook(Order order)
     {   
-        TreeMap<BigDecimal,PriceLevel> bookSide=order.getSide()==OrderSide.BUY?bids:asks;
+        ConcurrentSkipListMap<BigDecimal,PriceLevel> bookSide=order.getSide()==OrderSide.BUY?bids:asks;
         PriceLevel level=bookSide.computeIfAbsent(order.getPrice(),PriceLevel::new);
         level.addOrder(order);
 
