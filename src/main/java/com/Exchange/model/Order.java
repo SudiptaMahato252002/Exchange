@@ -34,4 +34,26 @@ public class Order
         this.remainingQuantiity = this.quantity;
     }
 
+    public void reduce(int quantity)
+    {
+        if(quantity<=0)
+        {
+            throw new IllegalArgumentException("Executed quantity must be positive");
+        }
+        if(quantity>this.remainingQuantiity)
+        {
+             throw new IllegalArgumentException("Executed quantity exceeds remaining quantity");
+        }
+        
+        this.remainingQuantiity-=quantity;
+        
+        if (this.remainingQuantiity == 0) {
+        this.status = OrderStatus.FILLED;
+        } 
+        else 
+        {
+            this.status = OrderStatus.PARTIALLY_FILLED;
+        }
+    }
+
 }

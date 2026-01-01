@@ -75,4 +75,14 @@ public class PriceLevel
     public LinkedList<Order> getOrders() {
         return orders;
     }
+
+    public void print() {
+        System.out.println("PriceLevel " + price);
+        for (Order o : orders) {
+            System.out.println("  " + o.getOrderId() + " → " + o.getRemainingQuantiity());
+        }
+        System.out.println("Total Volume = " + totalVolume);
+}
+
+
 }
