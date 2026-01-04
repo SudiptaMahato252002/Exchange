@@ -85,6 +85,11 @@ public class PriceLevel
         }
     }
 
+    public void updateVolume(int delta)
+    {
+        totalVolume.addAndGet(delta);
+    }
+
     public boolean isEmpty()
     {
         return orders.isEmpty();

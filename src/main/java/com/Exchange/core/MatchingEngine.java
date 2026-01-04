@@ -63,7 +63,7 @@ public class MatchingEngine
         {
             var bestBids=orderBook.getBids().firstEntry();
             BigDecimal bidPrice=bestBids.getKey();
-            if(sell.getSide()==OrderSide.SELL&&sell.getPrice().compareTo(bidPrice)>0)
+            if(sell.getType()==OrderType.LIMIT&&sell.getPrice().compareTo(bidPrice)>0)
             {
                 break;
             }
@@ -97,8 +97,11 @@ public class MatchingEngine
         resting.reduce(qty);
 
         return Trade.builder()
+            .tradeId(Trade.generateTradeId())
             .buyOrderId(incoming.getSide()==OrderSide.BUY?incoming.getOrderId():resting.getOrderId())
             .sellOrderId(incoming.getSide()==OrderSide.SELL?incoming.getOrderId():resting.getOrderId())
+            .baseAsset(incoming.getBaseAsset())
+            .quoteAsset(incoming.getQuoteAsset())
             .price(price)
             .quantity(qty)
             .timestamp(System.currentTimeMillis())

@@ -17,12 +17,9 @@ public class OrderBookSnapShot
     private List<PriceLevelInfo> bids;
     private List<PriceLevelInfo> asks;
     private BigDecimal lastTradePrice;
+    private String baseAsset;
+    private String quoteAsset;
+    private long timeStamp;
     
 }
 
-class PriceLevelInfo
-{
-    private BigDecimal price;
-    private int totalQuantity;
-    private int orderCount;
-}
