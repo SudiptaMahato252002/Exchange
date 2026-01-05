@@ -44,6 +44,13 @@ public class OrderService
         tradeService.recordTrades(trades);
         trades.forEach(webSocketService::broadcastTrade);
 
+        var orderBookSnapshot = orderBookService.getOrderBookSnapshot(
+            request.getBaseAsset(), 
+            request.getQuoteAsset(), 
+            10
+        );
+        webSocketService.orderBookUpdate(orderBookSnapshot);
+
         return convertToResponse(order, trades);
     }
 
