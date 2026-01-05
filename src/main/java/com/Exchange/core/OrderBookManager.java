@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+
 import com.Exchange.model.Order;
 import com.Exchange.model.OrderBookSnapShot;
 import com.Exchange.model.Trade;
 
+@Component
 public class OrderBookManager 
 {
 
