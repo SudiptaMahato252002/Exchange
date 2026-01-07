@@ -90,6 +90,11 @@ public class PriceLevel
         totalVolume.addAndGet(delta);
     }
 
+    public void reduceVolume(int quantity)
+    {
+        totalVolume.addAndGet(-quantity);
+    }
+    
     public boolean isEmpty()
     {
         return orders.isEmpty();
@@ -104,7 +109,6 @@ public class PriceLevel
     {
         return orders.size();
     }
-    
     
     public BigDecimal getPrice() {
         return price;

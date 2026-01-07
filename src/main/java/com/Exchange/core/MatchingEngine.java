@@ -41,7 +41,7 @@ public class MatchingEngine
                 Order sell=level.getFirstOrder();
                 if (sell == null) break;
 
-                Trade trade=executeMatch(buy, sell, askPrice);
+                Trade trade=executeMatch(buy, sell, askPrice,level);
                 trades.add(trade);
 
                 // if(sell.getRemainingQuantiity()==0)
@@ -73,7 +73,7 @@ public class MatchingEngine
             {
                 break;
             }
-            Trade trade=executeMatch(sell, buy, bidPrice);
+            Trade trade=executeMatch(sell, buy, bidPrice,level);
             trades.add(trade);
 
             // if(buy.getRemainingQuantiity()==0)
@@ -90,12 +90,13 @@ public class MatchingEngine
 
     }
 
-    private Trade executeMatch(Order incoming,Order resting,BigDecimal price)
+    private Trade executeMatch(Order incoming,Order resting,BigDecimal price,PriceLevel level)
     {
         int qty=Math.min(incoming.getRemainingQuantiity(),resting.getRemainingQuantiity());
         incoming.reduce(qty);
         resting.reduce(qty);
-
+        level.reduceVolume(qty);
+        
         return Trade.builder()
             .tradeId(Trade.generateTradeId())
             .buyOrderId(incoming.getSide()==OrderSide.BUY?incoming.getOrderId():resting.getOrderId())
