@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.Exchange.core.OrderBook;
+import com.Exchange.message.OrderMessage;
 import com.Exchange.model.Order;
 import com.Exchange.model.Trade;
 import com.Exchange.request.CancelOrderRequest;
@@ -22,12 +23,13 @@ import lombok.RequiredArgsConstructor;
 public class OrderService 
 {
     private final OrderBookService orderBookService;
+    private final KafkaOrderProcessingService orderProcessingService;
     private final TradeService tradeService;
     private final WebSocketMessageService webSocketService;
 
     public OrderResponse placeOrder(PlaceOrderRequest request)
     {
-        Order order=Order.builder()
+        OrderMessage orderMessage=OrderMessage.builder()
             .orderId(Order.generateOrderId(request.getUserId()))
             .userId(request.getUserId())
             .baseAsset(request.getBaseAsset())
@@ -39,20 +41,32 @@ public class OrderService
             .timeStamp(System.currentTimeMillis())
         .build();
 
-        OrderBook orderBook=orderBookService.getOrderBook(request.getBaseAsset(), request.getQuoteAsset());
-        List<Trade> trades=orderBook.addOrder(order);
-        tradeService.recordTrades(trades);
-        trades.forEach(webSocketService::broadcastTrade);
+        orderProcessingService.processOrder(orderMessage);
+        // OrderBook orderBook=orderBookService.getOrderBook(request.getBaseAsset(), request.getQuoteAsset());
+        // List<Trade> trades=orderBook.addOrder(order);
+        // tradeService.recordTrades(trades);
+        // trades.forEach(webSocketService::broadcastTrade);
 
-        var orderBookSnapshot = orderBookService.getOrderBookSnapshot(
-            request.getBaseAsset(), 
-            request.getQuoteAsset(), 
-            10
-        );
-        webSocketService.orderBookUpdate(orderBookSnapshot);
+        // var orderBookSnapshot = orderBookService.getOrderBookSnapshot(
+        //     request.getBaseAsset(), 
+        //     request.getQuoteAsset(), 
+        //     10
+        // );
+        // webSocketService.orderBookUpdate(orderBookSnapshot);
 
-        return convertToResponse(order, trades);
-    }
+         return OrderResponse.builder()
+            .orderId(orderMessage.getOrderId())
+            .userId(orderMessage.getUserId())
+            .baseAsset(orderMessage.getBaseAsset())
+            .quoteAsset(orderMessage.getQuoteAsset())
+            .side(orderMessage.getSide())
+            .type(orderMessage.getType())
+            .price(orderMessage.getPrice())
+            .quantity(orderMessage.getQuantity())
+            .remainingQuantiity(orderMessage.getQuantity())
+            .timeStamp(orderMessage.getTimeStamp())
+            .build();
+            }
 
     public boolean cancelOrder(CancelOrderRequest request)
     {
