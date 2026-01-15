@@ -28,6 +28,8 @@ public class KafkaOrderProcessingService
     private TradeProducer tradeProducer;
     @Autowired
     private WebSocketMessageService websocketService;
+    @Autowired
+    private CandleService candleService;
 
     public void processOrder(OrderMessage orderMessage)
     {
@@ -35,6 +37,8 @@ public class KafkaOrderProcessingService
         OrderBook orderbook=orderBookService.getOrderBook(order.getBaseAsset(), order.getQuoteAsset());
         List<Trade> trades=orderbook.addOrder(order);
         tradeService.recordTrades(trades);
+
+        trades.forEach(candleService::processTrade);
         List<TradeMessage> tradeMessages=trades.stream().map(this::convertToTradeMessage).collect(Collectors.toList());
         
         
